@@ -11,11 +11,6 @@ app = Flask(__name__)
 
 
 def format_date(value):
-    """
-
-    :param datetime.date value:
-    :return:
-    """
     return value.strftime('%d.%m.%Y')
 
 
