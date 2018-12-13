@@ -7,7 +7,6 @@
   <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
   <meta name="description" content="Anonymous">
   <meta name="author" content="">
-  <link rel="icon" href="favicon.ico">
 
   <title>Anonymous</title>
 
@@ -29,20 +28,14 @@
 </nav>
 
 <div class="container">
-  <form method="POST">
-    <div class="form-group">
-      <input name="header" class="form-control" placeholder="Заголовок" autofocus/>
-    </div>
-    <div class="form-group">
-      <input name="signature" class="form-control" placeholder="Подпись"/>
-    </div>
-    <div class="form-group">
-      <textarea name="body" class="form-control" rows="10" placeholder="Ваша история"></textarea>
-    </div>
-    <div class="form-group">
-      <button class="btn btn-primary" type="submit">Опубликовать</button>
-    </div>
-  </form>
+  <h1>{{ article['header'] }} <small></small></h1>
+  <p class="text-muted">
+    <span>{{ article['signature'] }}</span> • <time>{{ article['date']|date }}</time>
+  </p>
+
+  {{ article['body']|safe }}
+
+  <a href="/edit/{{ slug }}" class="btn btn-primary">Изменить</a>
 </div><!-- /.container -->
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
