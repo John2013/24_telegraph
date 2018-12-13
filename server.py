@@ -53,6 +53,16 @@ def get_article(slug):
     }
 
 
+def article_as_list(article_dict):
+    return [
+        article_dict['header'],
+        article_dict['signature'],
+        article_dict['body'],
+        article_dict['date'].toordinal(),
+        article_dict['id']
+    ]
+
+
 @app.route('/', methods=['GET', 'POST'])
 def form():
     if request.method == 'POST':
@@ -65,11 +75,7 @@ def form():
             cur_date.toordinal(),
             article_id
         ]
-        file_path, slug = get_article_file_path_and_slug(
-            request.form['header']
-        )
-        with open(file_path, 'w', encoding="utf-8") as file:
-            json.dump(article, file, ensure_ascii=False)
+        slug = save_article(article)
 
         article_ids = json.loads(request.cookies.get('articles') or "[]")
 
@@ -79,6 +85,21 @@ def form():
         return responce
 
     return render_template('form-create.html')
+
+
+def save_article(article, slug=None):
+    if not slug:
+        header_key = 0
+        file_path, slug = get_article_file_path_and_slug(
+            article[header_key]
+        )
+    else:
+        file_path = 'articles/{}.json'.format(slug)
+
+    with open(file_path, 'w', encoding="utf-8") as file:
+        json.dump(article, file, ensure_ascii=False)
+
+    return slug
 
 
 @app.route('/<string:slug>')
@@ -93,11 +114,28 @@ def article_page(slug):
         markdown_tags,
         markdown_attrs
     )
-    article_ids = json.loads(request.cookies.get('articles'))
-    if article['id'] in article_ids:
+    user_article_ids = json.loads(request.cookies.get('articles'))
+    if article['id'] in user_article_ids:
         return render_template('article-edit.html', article=article, slug=slug)
 
     return render_template('article.html', article=article)
+
+
+@app.route('/edit/<string:slug>', methods=['GET', 'POST'])
+def edit_page(slug):
+    article = get_article(slug)
+
+    user_article_ids = json.loads(request.cookies.get('articles'))
+    if article['id'] not in user_article_ids:
+        return render_template('403.html'), 403
+
+    if request.method == 'POST':
+        article['body'] = request.form['body']
+        list_article = article_as_list(article)
+        save_article(list_article, slug)
+        return redirect("/{}".format(slug))
+
+    return render_template('form-change.html', article=article)
 
 
 app.jinja_env.filters['date'] = format_date
