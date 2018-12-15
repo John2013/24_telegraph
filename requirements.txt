@@ -2,3 +2,4 @@ flask==1.0.2
 markdown==3.0.1
 bleach==3.0.2
 bleach-whitelist==0.0.9
+gunicorn=19.9.9
