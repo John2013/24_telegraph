@@ -12,8 +12,8 @@ from markdown import markdown
 app = Flask(__name__)
 
 
-def format_date(value):
-    return value.strftime('%d.%m.%Y')
+def format_date(date_value):
+    return date_value.strftime('%d.%m.%Y')
 
 
 def get_article_file_path_and_slug(header):
@@ -110,7 +110,8 @@ def article_page(slug):
     article = get_article(slug)
 
     if article is False:
-        return render_template('404.html'), 404
+        not_found_code = 404
+        return render_template('404.html'), not_found_code
 
     article['body'] = bleach.clean(
         markdown(article['body']),
@@ -130,7 +131,8 @@ def edit_page(slug):
 
     user_article_ids = json.loads(request.cookies.get('articles'))
     if article['id'] not in user_article_ids:
-        return render_template('403.html'), 403
+        access_denied_code = 403
+        return render_template('403.html'), access_denied_code
 
     if request.method == 'POST':
         article['body'] = request.form['body']
