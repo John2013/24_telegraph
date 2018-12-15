@@ -4,6 +4,7 @@ from datetime import date
 from json import JSONDecodeError
 from os import makedirs
 from os.path import exists
+from re import sub, compile
 
 import bleach
 from bleach_whitelist import markdown_tags, markdown_attrs
@@ -66,13 +67,18 @@ def article_as_list(article_dict):
     ]
 
 
+def clear_article_header(header):
+    re = compile(r"[\\/*+.,`~\r\n\t\f\v<>!@#$%^&=?'\"|]+")
+    return sub(re, '_', header)
+
+
 @app.route('/', methods=['GET', 'POST'])
 def form():
     if request.method == 'POST':
         cur_date = date.today()
         article_id = str(uuid.uuid4())
         article = [
-            request.form['header'],
+            clear_article_header(request.form['header']),
             request.form['signature'],
             request.form['body'],
             cur_date.toordinal(),
