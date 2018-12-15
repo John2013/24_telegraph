@@ -1,6 +1,7 @@
 import json
 import uuid
 from datetime import date
+from os import makedirs
 from os.path import exists
 
 import bleach
@@ -88,13 +89,15 @@ def form():
 
 
 def save_article(article, slug=None):
+    if not exists('./articles'):
+        makedirs('./articles')
     if not slug:
         header_key = 0
         file_path, slug = get_article_file_path_and_slug(
             article[header_key]
         )
     else:
-        file_path = 'articles/{}.json'.format(slug)
+        file_path = './articles/{}.json'.format(slug)
 
     with open(file_path, 'w', encoding="utf-8") as file:
         json.dump(article, file, ensure_ascii=False)
