@@ -164,18 +164,6 @@ def edit_page(slug):
     return render_template('form-change.html', article=article)
 
 
-@app.errorhandler(403)
-def forbidden(_):
-    access_denied_code = 403
-    return render_template('403.html'), access_denied_code
-
-
-@app.errorhandler(404)
-def page_not_found(_):
-    not_found_code = 404
-    return render_template('404.html'), not_found_code
-
-
 app.jinja_env.filters['date'] = format_date
 
 if __name__ == "__main__":
