@@ -1,6 +1,7 @@
 import json
 import uuid
 from datetime import date
+from json import JSONDecodeError
 from os import makedirs
 from os.path import exists
 
@@ -118,7 +119,14 @@ def article_page(slug):
         markdown_tags,
         markdown_attrs
     )
-    user_article_ids = json.loads(request.cookies.get('articles'))
+
+    try:
+        user_article_ids = json.loads(request.cookies.get('articles'))
+    except TypeError:
+        user_article_ids = []
+    except JSONDecodeError:
+        user_article_ids = []
+
     if article['id'] in user_article_ids:
         return render_template('article-edit.html', article=article, slug=slug)
 
@@ -129,7 +137,13 @@ def article_page(slug):
 def edit_page(slug):
     article = get_article(slug)
 
-    user_article_ids = json.loads(request.cookies.get('articles'))
+    try:
+        user_article_ids = json.loads(request.cookies.get('articles'))
+    except TypeError:
+        user_article_ids = []
+    except JSONDecodeError:
+        user_article_ids = []
+
     if article['id'] not in user_article_ids:
         access_denied_code = 403
         return render_template('403.html'), access_denied_code
