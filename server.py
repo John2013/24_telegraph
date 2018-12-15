@@ -7,7 +7,8 @@ from os.path import exists
 
 import bleach
 from bleach_whitelist import markdown_tags, markdown_attrs
-from flask import Flask, render_template, request, redirect, make_response
+from flask import Flask, render_template, request, redirect, make_response, \
+    abort
 from markdown import markdown
 
 app = Flask(__name__)
@@ -112,7 +113,7 @@ def article_page(slug):
 
     if article is False:
         not_found_code = 404
-        return render_template('404.html'), not_found_code
+        return abort(not_found_code)
 
     article['body'] = bleach.clean(
         markdown(article['body']),
@@ -146,7 +147,7 @@ def edit_page(slug):
 
     if article['id'] not in user_article_ids:
         access_denied_code = 403
-        return render_template('403.html'), access_denied_code
+        return abort(access_denied_code)
 
     if request.method == 'POST':
         article['body'] = request.form['body']
@@ -155,6 +156,18 @@ def edit_page(slug):
         return redirect("/{}".format(slug))
 
     return render_template('form-change.html', article=article)
+
+
+@app.errorhandler(403)
+def forbidden(_):
+    access_denied_code = 403
+    return render_template('403.html'), access_denied_code
+
+
+@app.errorhandler(404)
+def page_not_found(_):
+    not_found_code = 404
+    return render_template('404.html'), not_found_code
 
 
 app.jinja_env.filters['date'] = format_date
