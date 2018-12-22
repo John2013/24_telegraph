@@ -97,8 +97,7 @@ def form():
 
 
 def save_article(article, slug=None):
-    if not exists('./articles'):
-        makedirs('./articles')
+    makedirs('./articles', exist_ok=True)
     if not slug:
         header_key = 0
         file_path, slug = get_article_file_path_and_slug(
